@@ -1,4 +1,4 @@
-package com.jmblog.freeblog_batch.scheduler;
+package com.jmblog.freeblog_batch.job.scheduler;
 
 import com.jmblog.freeblog_batch.job.FreeBlogBatchJob;
 import lombok.extern.slf4j.Slf4j;
@@ -14,22 +14,23 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class JobScheduler {
+public class BatchJobScheduler {
     @Autowired
     private JobLauncher jobLauncher;
 
     @Autowired
     private FreeBlogBatchJob freeBlogBatchJob;
 
-    @Scheduled(cron = "5 * * * * *")
+    @Scheduled(cron = "59 23 * * * *") // 매일 23시 59분에 실행
     public void freeBlogBatchJobScheduler() {
         try {
+            log.info("[BatchJobScheduler:freeBlogBatchJobScheduler] freeblog batch scheduler done");
             Map<String, JobParameter> confMap = new HashMap<>();
             confMap.put("time", new JobParameter(System.currentTimeMillis()));
             JobParameters jobParameters = new JobParameters(confMap);
             jobLauncher.run(freeBlogBatchJob.processJob(), jobParameters);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("[BatchJobScheduler:freeBlogBatchJobScheduler] scheduler error =>", e);
         }
     }
 }
