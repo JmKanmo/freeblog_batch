@@ -40,6 +40,9 @@ spring:
         order_updates: true
 
   batch:
+    job:
+      enabled: false
+      names: "freeblog_batch_job"
     jdbc:
       initialize-schema: always
 
