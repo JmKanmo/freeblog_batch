@@ -1,0 +1,91 @@
+server:
+  port: 8500
+
+spring:
+  profiles:
+    include: env
+
+  datasource:
+    master:
+      hikari:
+        username: ${DB_MASTER_USERNAME}
+        password: ${DB_MASTER_PASSWORD}
+        driver-class-name: org.mariadb.jdbc.Driver
+        jdbc-url: jdbc:mariadb://${DB_MASTER_IP}:${DB_MASTER_PORT}/${DB_MASTER_SCHEMA}?useUnicode=yes&characterEncoding=UTF-8
+        pool-name: ${DB_MASTER_POOL}
+
+    slave:
+      hikari:
+        username: ${DB_SLAVE_USERNAME}
+        password: ${DB_SLAVE_PASSWORD}
+        driver-class-name: org.mariadb.jdbc.Driver
+        jdbc-url: jdbc:mariadb://${DB_SLAVE_IP}:${DB_SLAVE_PORT}/${DB_SLAVE_SCHEMA}?useUnicode=yes&characterEncoding=UTF-8
+        pool-name: ${DB_SLAVE_POOL}
+
+  jpa:
+    database-platform: org.hibernate.dialect.MariaDB103Dialect
+    hibernate:
+      format_sql: true
+      show_sql: true
+      use_sql_comments: true
+      ddl-auto: update
+      use-new-id-generator-mappings: true
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 10000
+          batch_versioned_data: true
+        order_inserts: true
+        order_updates: true
+
+  batch:
+    jdbc:
+      initialize-schema: always
+
+  redis:
+    lettuce:
+      pool:
+        max-active: 5
+        max-idle: 5
+        min-idle: 2
+        max-wait: 500
+    port: ${REDIS_PORT}
+    host: ${REDIS_HOST}
+    connect-timeout: 5000
+    timeout: 1500
+
+
+springdoc:
+  cache:
+    disabled: true
+  swagger-ui:
+    path: swagger-ui-custom.html
+  api-docs:
+    path: /api-docs
+  packages-to-scan: com.service.core
+
+
+logging:
+  pattern:
+    console: "[%d] %-5level [${PID:-} - %thread - {%C => %M, %l}] %logger : %msg%n"
+    file: "[%d] %-5level [${PID:-} - %thread - {%C => %M, %l}] %logger : %msg%n"
+
+  file:
+    name: ./logs/freeblog_batch.log
+    max-history: 30
+
+  level:
+    root: INFO
+    com.service: INFO
+
+    org.hibernate:
+#      SQL: debug
+#      type.descriptor.sql: trace
+
+mybatis:
+  mapper-locations: mybatis/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+
