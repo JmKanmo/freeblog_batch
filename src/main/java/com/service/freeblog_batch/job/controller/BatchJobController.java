@@ -1,4 +1,4 @@
-package com.jmblog.freeblog_batch.job.controller;
+package com.service.freeblog_batch.job.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 

@@ -1,4 +1,4 @@
-package com.jmblog.freeblog_batch.job.tasklet;
+package com.service.freeblog_batch.job.tasklet;
 
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -6,13 +6,13 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.stereotype.Component;
 
-@Component
-public class RDBProcessTasklet implements Tasklet {
 
+@Component
+public class NoSqlProcessTasklet implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        System.out.println("rdb step done");
+        System.out.println("no sql clean step done");
         return RepeatStatus.FINISHED;
     }
 }

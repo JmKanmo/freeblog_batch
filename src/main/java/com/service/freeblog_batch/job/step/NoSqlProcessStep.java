@@ -1,6 +1,6 @@
-package com.jmblog.freeblog_batch.job.step;
+package com.service.freeblog_batch.job.step;
 
-import com.jmblog.freeblog_batch.job.tasklet.NoSqlProcessTasklet;
+import com.service.freeblog_batch.job.tasklet.NoSqlProcessTasklet;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.beans.factory.annotation.Autowired;

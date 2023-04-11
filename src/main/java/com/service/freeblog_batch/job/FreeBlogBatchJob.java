@@ -1,7 +1,6 @@
-package com.jmblog.freeblog_batch.job;
+package com.service.freeblog_batch.job;
 
-import com.jmblog.freeblog_batch.job.step.NoSqlProcessStep;
-import com.jmblog.freeblog_batch.job.step.RDBProcessStep;
+import com.service.freeblog_batch.job.step.NoSqlProcessStep;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -16,7 +15,7 @@ public class FreeBlogBatchJob {
     private JobBuilderFactory jobBuilderFactory;
 
     @Autowired
-    private RDBProcessStep RDBProcessStep;
+    private com.service.freeblog_batch.job.step.RDBProcessStep RDBProcessStep;
 
     @Autowired
     private NoSqlProcessStep noSqlProcessStep;

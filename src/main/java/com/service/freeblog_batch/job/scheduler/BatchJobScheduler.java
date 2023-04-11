@@ -1,6 +1,6 @@
-package com.jmblog.freeblog_batch.job.scheduler;
+package com.service.freeblog_batch.job.scheduler;
 
-import com.jmblog.freeblog_batch.job.FreeBlogBatchJob;
+import com.service.freeblog_batch.job.FreeBlogBatchJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;

@@ -1,4 +1,4 @@
-package com.jmblog.freeblog_batch;
+package com.service.freeblog_batch;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.boot.SpringApplication;
