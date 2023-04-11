@@ -15,17 +15,7 @@ public class RDBProcessTasklet implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        System.out.println("rdb step done");
-        /**
-         * TODO 서비스 별로 메소드 작성해서 일괄처리
-         * RDB 데이터 처리
-         * user : 정지, 탈퇴 회원
-         * blog: 삭제 된 블로그 처리
-         * category: 삭제 된 블로그의 카테고리 처리
-         * post: 삭제 된 포스트 처리
-         * tag: (삭제 된 포스트의 태그 처리)
-         * comment: (삭제 된 게시글의 댓글 처리)
-         */
+        batchJdbcService.processData();
         return RepeatStatus.FINISHED;
     }
 }

@@ -1,4 +1,4 @@
-package com.service.freeblog_batch.web.repository;
+package com.service.freeblog_batch.web.repository.batch;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
