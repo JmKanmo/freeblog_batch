@@ -1,5 +1,12 @@
 package com.service.freeblog_batch.web.service;
 
+import com.service.freeblog_batch.web.domain.blog.Blog;
+import com.service.freeblog_batch.web.domain.category.Category;
+import com.service.freeblog_batch.web.domain.comment.Comment;
+import com.service.freeblog_batch.web.domain.post.Post;
+import com.service.freeblog_batch.web.domain.tag.Tag;
+import com.service.freeblog_batch.web.domain.user.User;
+import com.service.freeblog_batch.web.domain.user.UserStatus;
 import com.service.freeblog_batch.web.repository.batch.BatchJdbcTemplate;
 import com.service.freeblog_batch.web.repository.jpa.blog.BlogRepository;
 import com.service.freeblog_batch.web.repository.jpa.category.CategoryRepository;
@@ -12,9 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Slf4j
-@Transactional
 @RequiredArgsConstructor
 public class BatchJdbcService {
     private final BatchJdbcTemplate batchJdbcTemplate;
@@ -38,9 +47,103 @@ public class BatchJdbcService {
      */
     public void processData() {
         try {
+            // 삭제된 사용자 관련 데이터 처리
+            processDeletedUserRelatedData();
 
+            // 삭제 된 게시글 관련 데이터 처리
+            processDeletedPostRelatedData();
+
+            // 삭제된 카테고리 관련 데이터 처리
+            processDeletedCategoryRelatedData();
         } catch (Exception e) {
             log.error("[BatchJdbcService:processUser] error:{}", e);
         }
+    }
+
+    void processDeletedUserRelatedData() {
+        try {
+            List<Long> blogIds = processWithdrawAndStopUsersRelatedData();
+            processDeletedBlogAndRelationEntities(blogIds);
+        } catch (Exception e) {
+            log.error("[BatchJdbcService:processDeletedUserRelatedData] error:{}", e);
+        }
+    }
+
+    @Transactional
+    void processDeletedPostRelatedData() {
+        try {
+            List<Post> postList = postRepository.findDeletedPostList();
+
+            for (Post post : postList) {
+                deleteCommentByPost(post);
+                deleteTagByPost(post);
+            }
+            postRepository.deleteAll(postList);
+        } catch (Exception e) {
+            log.error("[BatchJdbcService:processDeletedPostRelatedData] error:{}", e);
+        }
+    }
+
+    @Transactional
+    void processDeletedCategoryRelatedData() {
+        try {
+            List<Category> categoryList = categoryRepository.findDeletedCategoryList();
+
+            for (Category category : categoryList) {
+                deletePostByCategory(category);
+            }
+            categoryRepository.deleteAll(categoryList);
+        } catch (Exception e) {
+            log.error("[BatchJdbcService:processDeletedCategoryRelatedData] error:{}", e);
+        }
+    }
+
+    @Transactional
+    List<Long> processWithdrawAndStopUsersRelatedData() {
+        List<User> users = userRepository.findWithdrawAndStopUsers(new UserStatus[]{UserStatus.WITHDRAW, UserStatus.STOP});
+        List<Long> blogIds = users.stream().map(user -> {
+            Blog blog = user.getBlog();
+            return blog.getId();
+        }).collect(Collectors.toList());
+        userRepository.deleteAll(users);
+        return blogIds;
+    }
+
+    @Transactional
+    void processDeletedBlogAndRelationEntities(List<Long> blogIds) {
+        List<Blog> blogList = blogRepository.findAllById(blogIds);
+
+        for (Blog blog : blogList) {
+            List<Post> postList = blog.getPostList();
+            List<Category> categoryList = blog.getCategoryList();
+
+            for (Post post : postList) {
+                deleteCommentByPost(post);
+                deleteTagByPost(post);
+            }
+            postRepository.deleteAll(postList);
+            categoryRepository.deleteAll(categoryList);
+        }
+        blogRepository.deleteAll(blogList);
+    }
+
+    private void deleteCommentByPost(Post post) {
+        List<Comment> commentList = post.getCommentList();
+        commentRepository.deleteAll(commentList);
+    }
+
+    private void deleteTagByPost(Post post) {
+        List<Tag> tagList = post.getTagList();
+        tagRepository.deleteAll(tagList);
+    }
+
+    private void deletePostByCategory(Category category) {
+        List<Post> postList = category.getPostList();
+
+        for (Post post : postList) {
+            deleteCommentByPost(post);
+            deleteTagByPost(post);
+        }
+        postRepository.deleteAll(postList);
     }
 }
