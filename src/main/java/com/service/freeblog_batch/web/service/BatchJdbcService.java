@@ -45,32 +45,32 @@ public class BatchJdbcService {
      * tag: (삭제 된 포스트의 태그 처리)
      * comment: (삭제 된 게시글의 댓글 처리)
      */
-    public void processData() {
+    public void updateFreeBlogData() {
         try {
             // 삭제된 사용자 관련 데이터 처리
-            processDeletedUserRelatedData();
+            updateDeletedUserRelatedData();
 
             // 삭제 된 게시글 관련 데이터 처리
-            processDeletedPostRelatedData();
+            updateDeletedPostRelatedData();
 
             // 삭제된 카테고리 관련 데이터 처리
-            processDeletedCategoryRelatedData();
+            updateDeletedCategoryRelatedData();
         } catch (Exception e) {
             log.error("[BatchJdbcService:processUser] error:{}", e);
         }
     }
 
-    void processDeletedUserRelatedData() {
+    void updateDeletedUserRelatedData() {
         try {
-            List<Long> blogIds = processWithdrawAndStopUsersRelatedData();
-            processDeletedBlogAndRelationEntities(blogIds);
+            List<Long> blogIds = updateWithdrawAndStopUsersRelatedData();
+            updateDeletedBlogAndRelationEntities(blogIds);
         } catch (Exception e) {
             log.error("[BatchJdbcService:processDeletedUserRelatedData] error:{}", e);
         }
     }
 
     @Transactional
-    void processDeletedPostRelatedData() {
+    void updateDeletedPostRelatedData() {
         try {
             List<Post> postList = postRepository.findDeletedPostList();
 
@@ -85,7 +85,7 @@ public class BatchJdbcService {
     }
 
     @Transactional
-    void processDeletedCategoryRelatedData() {
+    void updateDeletedCategoryRelatedData() {
         try {
             List<Category> categoryList = categoryRepository.findDeletedCategoryList();
 
@@ -99,7 +99,7 @@ public class BatchJdbcService {
     }
 
     @Transactional
-    List<Long> processWithdrawAndStopUsersRelatedData() {
+    List<Long> updateWithdrawAndStopUsersRelatedData() {
         List<User> users = userRepository.findWithdrawAndStopUsers(new UserStatus[]{UserStatus.WITHDRAW, UserStatus.STOP});
         List<Long> blogIds = users.stream().map(user -> {
             Blog blog = user.getBlog();
@@ -110,7 +110,7 @@ public class BatchJdbcService {
     }
 
     @Transactional
-    void processDeletedBlogAndRelationEntities(List<Long> blogIds) {
+    void updateDeletedBlogAndRelationEntities(List<Long> blogIds) {
         List<Blog> blogList = blogRepository.findAllById(blogIds);
 
         for (Blog blog : blogList) {

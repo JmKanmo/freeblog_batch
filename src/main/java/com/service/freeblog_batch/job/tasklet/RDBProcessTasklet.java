@@ -15,7 +15,7 @@ public class RDBProcessTasklet implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        batchJdbcService.processData();
+        batchJdbcService.updateFreeBlogData();
         return RepeatStatus.FINISHED;
     }
 }
