@@ -32,11 +32,15 @@ public class BatchRedisTemplate {
             try {
                 BlogVisitors blogVisitors = jsonUtil.readClzValue(String.valueOf(blogVisitorsValueOperations.get(key)), BlogVisitors.class);
                 blogVisitors.update();
-                blogVisitorsValueOperations.set(key, blogVisitors);
+                writeBlogVisitorsOperation(key, blogVisitors);
             } catch (Exception e) {
                 log.error("[BatchRedisTemplate:updateVisitors] error:{}", e);
             }
         }
+    }
+
+    private void writeBlogVisitorsOperation(Object key, Object value) throws Exception {
+        getBlogVisitorsOperation().set(String.valueOf(key), jsonUtil.writeValueAsString(value));
     }
 
     private ValueOperations<String, Object> getBlogVisitorsOperation() {

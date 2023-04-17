@@ -21,7 +21,7 @@ public class BatchJobScheduler {
     @Autowired
     private FreeBlogBatchJob freeBlogBatchJob;
 
-    @Scheduled(cron = "59 23 * * * *") // 매일 23시 59분에 실행
+    @Scheduled(cron = "0 59 23 * * *") // 매일 23시 59분에 실행
     public void freeBlogBatchJobScheduler() {
         try {
             log.info("[BatchJobScheduler:freeBlogBatchJobScheduler] freeblog batch scheduler done");
