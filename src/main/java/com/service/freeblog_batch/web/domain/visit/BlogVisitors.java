@@ -39,14 +39,24 @@ public class BlogVisitors implements Serializable {
 
     private long totalViews; // 전체 방문 횟수
 
+    /**
+     * 어제 방문자 = 오늘 방문자
+     * 전체 방문자 += 오늘 방문자
+     * 오늘 방문자 = 0
+     * <p>
+     * 뷰 = 이하 동일
+     * <p>
+     * 방문자 set clear
+     */
     public void update() {
-        /**
-         * 어제 방문자 = 오늘 방문자
-         * 전체 방문자 += 오늘 방문자
-         * 오늘 방문자 = 0
-         */
         this.yesterdayVisitors = this.todayVisitors;
         this.totalVisitors += this.todayVisitors;
         this.todayVisitors = 0;
+
+        this.yesterdayViews = this.todayViews;
+        this.totalViews += this.todayViews;
+        this.todayViews = 0;
+
+        this.visitorSet.clear();
     }
 }
