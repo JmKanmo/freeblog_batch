@@ -41,6 +41,8 @@ public class Post extends BaseTimeEntity {
     @Lob
     private String contents;
 
+    private String metaKey;
+
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(mappedBy = "post")
     private List<Tag> tagList;

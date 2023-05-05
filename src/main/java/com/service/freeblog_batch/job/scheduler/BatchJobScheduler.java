@@ -33,4 +33,8 @@ public class BatchJobScheduler {
             log.error("[BatchJobScheduler:freeBlogBatchJobScheduler] scheduler error =>", e);
         }
     }
+
+    /**
+     * TODO Sftp 오래된 미참조 파일 삭제 스케쥴 추가
+     */
 }

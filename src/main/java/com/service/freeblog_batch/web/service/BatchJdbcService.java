@@ -14,6 +14,7 @@ import com.service.freeblog_batch.web.repository.jpa.comment.CommentRepository;
 import com.service.freeblog_batch.web.repository.jpa.post.PostRepository;
 import com.service.freeblog_batch.web.repository.jpa.tag.TagRepository;
 import com.service.freeblog_batch.web.repository.jpa.user.UserRepository;
+import com.service.freeblog_batch.web.util.ConstUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class BatchJdbcService {
     private final TagRepository tagRepository;
     private final CommentRepository commentRepository;
 
+    private final BatchSftpService batchSftpService;
 
     /**
      * TODO 서비스 별로 메소드 작성해서 일괄처리
@@ -77,6 +79,7 @@ public class BatchJdbcService {
             for (Post post : postList) {
                 deleteCommentByPost(post);
                 deleteTagByPost(post);
+                batchSftpService.deleteImageFile(ConstUtil.SFTP_POST_IMAGE_HASH, post.getMetaKey());
             }
             postRepository.deleteAll(postList);
         } catch (Exception e) {
@@ -101,6 +104,7 @@ public class BatchJdbcService {
     @Transactional
     List<Long> updateWithdrawAndStopUsersRelatedData() {
         List<User> users = userRepository.findWithdrawAndStopUsers(new UserStatus[]{UserStatus.WITHDRAW, UserStatus.STOP});
+        // TODO delete user thumbnail image
         List<Long> blogIds = users.stream().map(user -> {
             Blog blog = user.getBlog();
             return blog.getId();
@@ -120,6 +124,7 @@ public class BatchJdbcService {
             for (Post post : postList) {
                 deleteCommentByPost(post);
                 deleteTagByPost(post);
+                batchSftpService.deleteImageFile(ConstUtil.SFTP_POST_IMAGE_HASH, post.getMetaKey());
             }
             postRepository.deleteAll(postList);
             categoryRepository.deleteAll(categoryList);
@@ -129,6 +134,7 @@ public class BatchJdbcService {
 
     private void deleteCommentByPost(Post post) {
         List<Comment> commentList = post.getCommentList();
+        // TODO delete comment image
         commentRepository.deleteAll(commentList);
     }
 
@@ -143,6 +149,7 @@ public class BatchJdbcService {
         for (Post post : postList) {
             deleteCommentByPost(post);
             deleteTagByPost(post);
+            batchSftpService.deleteImageFile(ConstUtil.SFTP_POST_IMAGE_HASH, post.getMetaKey());
         }
         postRepository.deleteAll(postList);
     }
