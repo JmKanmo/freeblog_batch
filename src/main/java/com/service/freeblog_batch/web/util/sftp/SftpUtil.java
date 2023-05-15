@@ -29,7 +29,10 @@ public class SftpUtil {
         try {
             connectSFTP();
             String dir = sFtpConfig.getDirectory() + "/" + type + "/" + hash + "/" + id;
-            channelSftp.rmdir(dir);
+
+            if (checkDir(dir)) {
+                channelSftp.rmdir(dir);
+            }
 
             dir = sFtpConfig.getDirectory() + "/" + type + "/" + hash;
             if (channelSftp.ls(dir).size() <= 2) {
