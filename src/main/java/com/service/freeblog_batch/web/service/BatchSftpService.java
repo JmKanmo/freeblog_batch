@@ -55,6 +55,7 @@ public class BatchSftpService {
     /**
      * TODO 추후에 아래 기능 수행 메서드 추가 개발
      * video 파일 삭제
-     * 특정 기간(N년) 동안 미참조 이미지,비디오 파일 삭제
+     * 특정 기간(N년) 동안 미참조 이미지,비디오 파일 삭제 | 생성된지 N년 (특정 기한)이 지난 파일 삭제
+     * (get lastModifiedTime method): https://www.tabnine.com/code/java/methods/com.jcraft.jsch.SftpATTRS/getMTime
      */
 }
