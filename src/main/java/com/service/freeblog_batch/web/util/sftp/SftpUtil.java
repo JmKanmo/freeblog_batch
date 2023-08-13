@@ -17,6 +17,46 @@ public class SftpUtil {
     private ChannelSftp channelSftp;
     private final SFtpConfig sFtpConfig;
 
+    public String doCommand(String type, int hash, String id, String command) throws Exception {
+        StringBuilder stringBuilder = new StringBuilder();
+        String dir = sFtpConfig.getDirectory() + "/" + type + "/" + hash + "/" + id;
+
+        try {
+            connectSFTP();
+
+            ChannelExec channel = (ChannelExec) jschSession.openChannel("exec");
+            channel.setCommand(command);
+            channel.setInputStream(null);
+            channel.setErrStream(System.err);
+
+            try (BufferedInputStream bufferedInputStream = new BufferedInputStream(channel.getInputStream())) {
+                channel.connect();
+
+                byte[] tmp = new byte[1024];
+
+                while (true) {
+                    while (bufferedInputStream.available() > 0) {
+                        int i = bufferedInputStream.read(tmp, 0, 1024);
+
+                        if (i < 0) {
+                            break;
+                        }
+                        stringBuilder.append(new String(tmp, 0, i));
+                    }
+
+                    if (channel.isClosed()) {
+                        if (bufferedInputStream.available() > 0) continue;
+                        System.out.println("Exit status: " + channel.getExitStatus());
+                        break;
+                    }
+                }
+            }
+            disconnectSFTP();
+        } catch (SftpException sftpException) {
+            throw sftpException;
+        }
+        return stringBuilder.toString();
+    }
 
     /**
      * type/hash/id 디렉토리 삭제

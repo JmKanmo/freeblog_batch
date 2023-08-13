@@ -62,7 +62,7 @@ public class BatchJdbcService {
         }
     }
 
-    void updateDeletedUserRelatedData() {
+    public void updateDeletedUserRelatedData() {
         try {
             List<Long> blogIds = updateWithdrawAndStopUsersRelatedData();
             updateDeletedBlogAndRelationEntities(blogIds);
@@ -72,13 +72,14 @@ public class BatchJdbcService {
     }
 
     @Transactional
-    void updateDeletedPostRelatedData() {
+    public void updateDeletedPostRelatedData() {
         try {
             List<Post> postList = postRepository.findDeletedPostList();
 
             for (Post post : postList) {
                 deleteCommentByPost(post);
                 deleteTagByPost(post);
+                // TODO delete Post thumbnail Image
                 batchSftpService.deleteImageFile(ConstUtil.SFTP_POST_IMAGE_HASH, post.getMetaKey());
             }
             postRepository.deleteAll(postList);
@@ -88,7 +89,7 @@ public class BatchJdbcService {
     }
 
     @Transactional
-    void updateDeletedCategoryRelatedData() {
+    public void updateDeletedCategoryRelatedData() {
         try {
             List<Category> categoryList = categoryRepository.findDeletedCategoryList();
 
@@ -102,7 +103,7 @@ public class BatchJdbcService {
     }
 
     @Transactional
-    List<Long> updateWithdrawAndStopUsersRelatedData() {
+    public List<Long> updateWithdrawAndStopUsersRelatedData() {
         List<User> users = userRepository.findWithdrawAndStopUsers(new UserStatus[]{UserStatus.WITHDRAW, UserStatus.STOP});
         // TODO delete user thumbnail image
         List<Long> blogIds = users.stream().map(user -> {
@@ -114,7 +115,7 @@ public class BatchJdbcService {
     }
 
     @Transactional
-    void updateDeletedBlogAndRelationEntities(List<Long> blogIds) {
+    public void updateDeletedBlogAndRelationEntities(List<Long> blogIds) {
         List<Blog> blogList = blogRepository.findAllById(blogIds);
 
         for (Blog blog : blogList) {
@@ -124,6 +125,7 @@ public class BatchJdbcService {
             for (Post post : postList) {
                 deleteCommentByPost(post);
                 deleteTagByPost(post);
+                // TODO delete Post thumbnail Image
                 batchSftpService.deleteImageFile(ConstUtil.SFTP_POST_IMAGE_HASH, post.getMetaKey());
             }
             postRepository.deleteAll(postList);
@@ -134,7 +136,7 @@ public class BatchJdbcService {
 
     private void deleteCommentByPost(Post post) {
         List<Comment> commentList = post.getCommentList();
-        // TODO delete comment image
+        // TODO delete comment thumbnail image
         commentRepository.deleteAll(commentList);
     }
 
@@ -149,6 +151,7 @@ public class BatchJdbcService {
         for (Post post : postList) {
             deleteCommentByPost(post);
             deleteTagByPost(post);
+            // TODO delete Post thumbnail Image
             batchSftpService.deleteImageFile(ConstUtil.SFTP_POST_IMAGE_HASH, post.getMetaKey());
         }
         postRepository.deleteAll(postList);
