@@ -2,14 +2,20 @@ package com.service.freeblog_batch.web.util.sftp;
 
 import com.jcraft.jsch.*;
 import com.service.freeblog_batch.config.sftp.SFtpConfig;
+import com.service.freeblog_batch.web.util.BatchUtil;
 import com.service.freeblog_batch.web.util.ConstUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Properties;
+import java.util.Vector;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class SftpUtil {
     private Session jschSession;
@@ -17,13 +23,65 @@ public class SftpUtil {
     private ChannelSftp channelSftp;
     private final SFtpConfig sFtpConfig;
 
-    public String doCommand(String type, int hash, String id, String command) throws Exception {
-        StringBuilder stringBuilder = new StringBuilder();
-        String dir = sFtpConfig.getDirectory() + "/" + type + "/" + hash + "/" + id;
 
+    private boolean checkFileLastViewTime(String directory, long maxDiffSec) {
+        try {
+            String command = BatchUtil.calcFileSizeCommand(directory);
+            String viewTimeResult = doCommand(command);
+            String[] splited = viewTimeResult.split(" ");
+            String viewTime = splited[0] + " " + splited[1].substring(0, splited[1].lastIndexOf("."));
+            LocalDateTime convertedLocalDateTime = BatchUtil.formatStrToLocalDateTime(viewTime, "yyyy-MM-dd HH:mm:ss");
+            long diffSec = Duration.between(convertedLocalDateTime, LocalDateTime.now()).toSeconds();
+            return diffSec > maxDiffSec;
+        } catch (Exception e) {
+            log.info("[SftpUtil:checkFileTime] Exception: " + e);
+            return false;
+        }
+    }
+
+    private void traversalDirectory(String directory, long maxDiffSec) throws Exception {
+        try {
+            Vector<ChannelSftp.LsEntry> directoryEntries = channelSftp.ls(directory);
+            boolean isEmptyDir = directoryEntries.size() <= 2;
+
+            if (!isEmptyDir) {
+                for (ChannelSftp.LsEntry entry : directoryEntries) {
+                    String fileName = entry.getFilename();
+
+                    if (fileName.equals(".") || fileName.equals("..")) {
+                        continue;
+                    }
+
+                    String fullFileDir = directory + "/" + fileName;
+
+                    if (!entry.getAttrs().isDir()) {
+                        if (checkFileLastViewTime(fullFileDir, maxDiffSec)) {
+                            deleteImageFile(fullFileDir);
+                        }
+                    } else {
+                        traversalDirectory(fullFileDir, maxDiffSec);
+                    }
+                }
+            }
+        } catch (SftpException sftpException) {
+            throw sftpException;
+        }
+    }
+
+    public void checkAngDeleteFile(String directory, long maxDiffSec) throws Exception {
         try {
             connectSFTP();
+            traversalDirectory(directory, maxDiffSec);
+            disconnectSFTP();
+        } catch (SftpException sftpException) {
+            throw sftpException;
+        }
+    }
 
+    private String doCommand(String command) throws Exception {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
             ChannelExec channel = (ChannelExec) jschSession.openChannel("exec");
             channel.setCommand(command);
             channel.setInputStream(null);
@@ -46,14 +104,13 @@ public class SftpUtil {
 
                     if (channel.isClosed()) {
                         if (bufferedInputStream.available() > 0) continue;
-                        System.out.println("Exit status: " + channel.getExitStatus());
+                        log.info("[SftpUtil:doCommand] Exit status: " + channel.getExitStatus());
                         break;
                     }
                 }
             }
-            disconnectSFTP();
-        } catch (SftpException sftpException) {
-            throw sftpException;
+        } catch (Exception exception) {
+            log.error("[SftpUtil:doCommand] Exception: " + exception);
         }
         return stringBuilder.toString();
     }
@@ -84,6 +141,20 @@ public class SftpUtil {
                 channelSftp.rmdir(dir);
             }
             disconnectSFTP();
+        } catch (SftpException sftpException) {
+            throw sftpException;
+        }
+    }
+
+    /**
+     * directory 파일 삭제
+     *
+     * @param directory (directory)
+     * @throws Exception
+     */
+    public void deleteImageFile(String directory) throws Exception {
+        try {
+            channelSftp.rm(directory);
         } catch (SftpException sftpException) {
             throw sftpException;
         }
