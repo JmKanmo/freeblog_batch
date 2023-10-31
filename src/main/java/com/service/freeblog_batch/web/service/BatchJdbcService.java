@@ -3,6 +3,8 @@ package com.service.freeblog_batch.web.service;
 import com.service.freeblog_batch.web.domain.blog.Blog;
 import com.service.freeblog_batch.web.domain.category.Category;
 import com.service.freeblog_batch.web.domain.comment.Comment;
+import com.service.freeblog_batch.web.domain.music.UserMusic;
+import com.service.freeblog_batch.web.domain.music.UserMusicCategory;
 import com.service.freeblog_batch.web.domain.post.Post;
 import com.service.freeblog_batch.web.domain.tag.Tag;
 import com.service.freeblog_batch.web.domain.user.User;
@@ -11,6 +13,8 @@ import com.service.freeblog_batch.web.repository.batch.BatchJdbcTemplate;
 import com.service.freeblog_batch.web.repository.jpa.blog.BlogRepository;
 import com.service.freeblog_batch.web.repository.jpa.category.CategoryRepository;
 import com.service.freeblog_batch.web.repository.jpa.comment.CommentRepository;
+import com.service.freeblog_batch.web.repository.jpa.music.UserMusicCategoryRepository;
+import com.service.freeblog_batch.web.repository.jpa.music.UserMusicRepository;
 import com.service.freeblog_batch.web.repository.jpa.post.PostRepository;
 import com.service.freeblog_batch.web.repository.jpa.tag.TagRepository;
 import com.service.freeblog_batch.web.repository.jpa.user.UserRepository;
@@ -34,6 +38,8 @@ public class BatchJdbcService {
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final CommentRepository commentRepository;
+    private final UserMusicCategoryRepository userMusicCategoryRepository;
+    private final UserMusicRepository userMusicRepository;
 
     private final BatchSftpService batchSftpService;
 
@@ -46,6 +52,7 @@ public class BatchJdbcService {
      * post: 삭제 된 포스트 처리
      * tag: (삭제 된 포스트의 태그 처리)
      * comment: (삭제 된 게시글의 댓글 처리)
+     * user(music/music-category): 사용자의 삭제 된 뮤직, 뮤직 요소가 없는 카테고리 삭제 처리
      */
     public void updateFreeBlogData() {
         try {
@@ -57,6 +64,8 @@ public class BatchJdbcService {
 
             // 삭제된 카테고리 관련 데이터 처리
             updateDeletedCategoryRelatedData();
+
+            // 삭제 된 사용자(뮤직,뮤직-카테고리) 처리
         } catch (Exception e) {
             log.error("[BatchJdbcService:processUser] error:{}", e);
         }
@@ -130,8 +139,14 @@ public class BatchJdbcService {
             }
             postRepository.deleteAll(postList);
             categoryRepository.deleteAll(categoryList);
+            deleteMusicInfoByBlog(blog);
         }
         blogRepository.deleteAll(blogList);
+    }
+
+    @Transactional
+    public void updateDeletedMusicInfo() {
+        // TODO
     }
 
     private void deleteCommentByPost(Post post) {
@@ -155,5 +170,15 @@ public class BatchJdbcService {
             batchSftpService.deleteImageFile(ConstUtil.SFTP_POST_IMAGE_HASH, post.getMetaKey());
         }
         postRepository.deleteAll(postList);
+    }
+
+    private void deleteMusicInfoByBlog(Blog blog) {
+        List<UserMusicCategory> userMusicCategoryList = blog.getUserMusicCategoryList();
+
+        for (UserMusicCategory userMusicCategory : userMusicCategoryList) {
+            List<UserMusic> userMusicList = userMusicCategory.getUserMusicList();
+            userMusicRepository.deleteAll(userMusicList);
+        }
+        userMusicCategoryRepository.deleteAll(userMusicCategoryList);
     }
 }

@@ -2,6 +2,7 @@ package com.service.freeblog_batch.web.domain.blog;
 
 
 import com.service.freeblog_batch.web.domain.category.Category;
+import com.service.freeblog_batch.web.domain.music.UserMusicCategory;
 import com.service.freeblog_batch.web.domain.post.Post;
 import com.service.freeblog_batch.web.domain.user.User;
 import com.service.freeblog_batch.web.util.domain.BaseTimeEntity;
@@ -43,4 +44,8 @@ public class Blog extends BaseTimeEntity {
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(mappedBy = "blog")
     private List<Post> postList;
+
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "blog")
+    private List<UserMusicCategory> userMusicCategoryList;
 }
