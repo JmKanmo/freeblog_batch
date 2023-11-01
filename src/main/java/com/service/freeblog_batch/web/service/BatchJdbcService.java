@@ -65,7 +65,8 @@ public class BatchJdbcService {
             // 삭제된 카테고리 관련 데이터 처리
             updateDeletedCategoryRelatedData();
 
-            // 삭제 된 사용자(뮤직,뮤직-카테고리) 처리
+            // 삭제 된 사용자(뮤직,뮤직-카테고리) 관련 데이터 처리
+            updateDeletedMusicRelatedData();
         } catch (Exception e) {
             log.error("[BatchJdbcService:processUser] error:{}", e);
         }
@@ -144,9 +145,29 @@ public class BatchJdbcService {
         blogRepository.deleteAll(blogList);
     }
 
+    public void updateDeletedMusicRelatedData() {
+        deleteUserMusicInfo();
+        deleteMusicCategoryInfo();
+    }
+
     @Transactional
-    public void updateDeletedMusicInfo() {
-        // TODO
+    public void deleteMusicCategoryInfo() {
+        try {
+            List<UserMusicCategory> userMusicCategoryList = userMusicCategoryRepository.findDeletedUserMusicCategory();
+            userMusicCategoryRepository.deleteAll(userMusicCategoryList);
+        } catch (Exception e) {
+            log.error("[BatchJdbcService:deleteMusicCategoryInfo] error:{}", e);
+        }
+    }
+
+    @Transactional
+    public void deleteUserMusicInfo() {
+        try {
+            List<UserMusic> userMusicList = userMusicRepository.findDeletedUserMusic();
+            userMusicRepository.deleteAll(userMusicList);
+        } catch (Exception e) {
+            log.error("[BatchJdbcService:deleteMusicInfo] error:{}", e);
+        }
     }
 
     private void deleteCommentByPost(Post post) {

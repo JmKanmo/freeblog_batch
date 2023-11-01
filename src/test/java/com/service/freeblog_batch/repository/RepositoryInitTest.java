@@ -1,10 +1,14 @@
 package com.service.freeblog_batch.repository;
 
+import com.service.freeblog_batch.web.domain.music.UserMusic;
+import com.service.freeblog_batch.web.domain.music.UserMusicCategory;
 import com.service.freeblog_batch.web.domain.user.User;
 import com.service.freeblog_batch.web.domain.user.UserStatus;
 import com.service.freeblog_batch.web.repository.jpa.blog.BlogRepository;
 import com.service.freeblog_batch.web.repository.jpa.category.CategoryRepository;
 import com.service.freeblog_batch.web.repository.jpa.comment.CommentRepository;
+import com.service.freeblog_batch.web.repository.jpa.music.UserMusicCategoryRepository;
+import com.service.freeblog_batch.web.repository.jpa.music.UserMusicRepository;
 import com.service.freeblog_batch.web.repository.jpa.post.PostRepository;
 import com.service.freeblog_batch.web.repository.jpa.tag.TagRepository;
 import com.service.freeblog_batch.web.repository.jpa.user.UserRepository;
@@ -37,6 +41,12 @@ public class RepositoryInitTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserMusicRepository userMusicRepository;
+
+    @Autowired
+    private UserMusicCategoryRepository userMusicCategoryRepository;
+
     @Test
     public void init() {
         Assertions.assertNotNull(blogRepository);
@@ -51,5 +61,19 @@ public class RepositoryInitTest {
     void withdrawUserTest() {
         List<User> userList = userRepository.findWithdrawAndStopUsers(new UserStatus[]{UserStatus.NOT_AUTH});
         Assertions.assertNotNull(userList);
+    }
+
+    @Test
+    @Transactional(readOnly = true)
+    void userMusicTest() {
+        List<UserMusic> userMusicList = userMusicRepository.findDeletedUserMusic();
+        Assertions.assertNotNull(userMusicList);
+    }
+
+    @Test
+    @Transactional(readOnly = true)
+    void userMusicCategoryTest() {
+        List<UserMusicCategory> userMusicCategoryList = userMusicCategoryRepository.findDeletedUserMusicCategory();
+        Assertions.assertNotNull(userMusicCategoryList);
     }
 }
