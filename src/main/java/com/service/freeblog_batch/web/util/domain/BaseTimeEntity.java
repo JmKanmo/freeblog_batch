@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PrePersist;
 import java.time.LocalDateTime;
 
 @Data
@@ -24,11 +25,16 @@ public abstract class BaseTimeEntity {
      * TRUE: 서버 기본 시간(UTC,GMT) 기준의 시간 데이터 저장
      * FALSE: (Asia/Seoul 타임존) 기준의 시간 데이터 저장 (기존에 저장 및 관리 된 데이터 호환)
      */
-    private Boolean isBaseTimezone;
+    private boolean isBaseTimezone;
 
     @CreatedDate
     private LocalDateTime registerTime;
 
     @LastModifiedDate
     private LocalDateTime updateTime;
+
+    @PrePersist
+    public void init() {
+        this.isBaseTimezone = true;
+    }
 }
