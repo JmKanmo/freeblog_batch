@@ -2,12 +2,13 @@ package com.service.freeblog_batch.web.domain.music;
 
 import com.service.freeblog_batch.web.util.domain.BaseTimeEntity;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "user_music",

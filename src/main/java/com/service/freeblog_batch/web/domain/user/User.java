@@ -2,13 +2,14 @@ package com.service.freeblog_batch.web.domain.user;
 
 import com.service.freeblog_batch.web.domain.blog.Blog;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = "blog")

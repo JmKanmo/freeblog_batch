@@ -3,12 +3,13 @@ package com.service.freeblog_batch.web.domain.tag;
 import com.service.freeblog_batch.web.domain.post.Post;
 import com.service.freeblog_batch.web.util.domain.BaseTimeEntity;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(exclude = "post")
