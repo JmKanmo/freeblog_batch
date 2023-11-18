@@ -89,8 +89,8 @@ public class BatchJdbcService {
             for (Post post : postList) {
                 deleteCommentByPost(post);
                 deleteTagByPost(post);
-                // TODO delete Post thumbnail Image
-                batchSftpService.deleteImageFile(ConstUtil.SFTP_POST_IMAGE_HASH, post.getMetaKey());
+//                batchSftpService.deleteImageFile(ConstUtil.SFTP_POST_THUMBNAIL_HASH, post.getMetaKey());
+//                batchSftpService.deleteImageFile(ConstUtil.SFTP_POST_IMAGE_HASH, post.getMetaKey());
             }
             postRepository.deleteAll(postList);
         } catch (Exception e) {
@@ -115,8 +115,9 @@ public class BatchJdbcService {
     @Transactional
     public List<Long> updateWithdrawAndStopUsersRelatedData() {
         List<User> users = userRepository.findWithdrawAndStopUsers(new UserStatus[]{UserStatus.WITHDRAW, UserStatus.STOP});
-        // TODO delete user thumbnail image
+
         List<Long> blogIds = users.stream().map(user -> {
+//            batchSftpService.deleteImageFile(ConstUtil.SFTP_PROFILE_THUMBNAIL_HASH, user.getMetaKey());
             Blog blog = user.getBlog();
             return blog.getId();
         }).collect(Collectors.toList());
@@ -135,8 +136,8 @@ public class BatchJdbcService {
             for (Post post : postList) {
                 deleteCommentByPost(post);
                 deleteTagByPost(post);
-                // TODO delete Post thumbnail Image
-                batchSftpService.deleteImageFile(ConstUtil.SFTP_POST_IMAGE_HASH, post.getMetaKey());
+//                batchSftpService.deleteImageFile(ConstUtil.SFTP_POST_THUMBNAIL_HASH, post.getMetaKey());
+//                batchSftpService.deleteImageFile(ConstUtil.SFTP_POST_IMAGE_HASH, post.getMetaKey());
             }
             postRepository.deleteAll(postList);
             categoryRepository.deleteAll(categoryList);
@@ -172,7 +173,10 @@ public class BatchJdbcService {
 
     private void deleteCommentByPost(Post post) {
         List<Comment> commentList = post.getCommentList();
-        // TODO delete comment thumbnail image
+
+//        for (Comment comment : commentList) {
+//            batchSftpService.deleteImageFile(ConstUtil.SFTP_COMMENT_IMAGE_HASH, comment.getMetaKey());
+//        }
         commentRepository.deleteAll(commentList);
     }
 
@@ -187,8 +191,8 @@ public class BatchJdbcService {
         for (Post post : postList) {
             deleteCommentByPost(post);
             deleteTagByPost(post);
-            // TODO delete Post thumbnail Image
-            batchSftpService.deleteImageFile(ConstUtil.SFTP_POST_IMAGE_HASH, post.getMetaKey());
+//            batchSftpService.deleteImageFile(ConstUtil.SFTP_POST_THUMBNAIL_HASH, post.getMetaKey());
+//            batchSftpService.deleteImageFile(ConstUtil.SFTP_POST_IMAGE_HASH, post.getMetaKey());
         }
         postRepository.deleteAll(postList);
     }

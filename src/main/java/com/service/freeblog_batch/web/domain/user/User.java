@@ -43,6 +43,8 @@ public class User {
 
     private boolean isAuth;
 
+    private String metaKey;
+
     private LocalDateTime emailAuthTime;
     private LocalDateTime passwordUpdateTime;
     private LocalDateTime withdrawTime;

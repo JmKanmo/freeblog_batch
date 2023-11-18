@@ -17,8 +17,8 @@ public class BatchSftpService {
     private final BatchConfig batchConfig;
 
     /**
-     * @param hash (USER_PROFILE_THUMBNAIL_HASH | POST_HASH | COMMENT_HASH)
-     * @param id   (USER_ID | POST_META_KEY | COMMENT_IMAGE_META_KEY)
+     * @param hash (USER_PROFILE_THUMBNAIL_HASH | POST_HASH | COMMENT_HASH ...)
+     * @param id   (USER_ID | POST_META_KEY | COMMENT_IMAGE_META_KEY ...)
      */
     public void deleteImageFile(int hash, String id) {
         try {

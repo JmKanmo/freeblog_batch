@@ -34,6 +34,8 @@ public class Comment extends BaseTimeEntity {
 
     private boolean anonymous;
 
+    private String metaKey;
+
     @Embedded
     private CommentUser commentUser;
 
