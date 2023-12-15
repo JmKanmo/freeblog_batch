@@ -12,6 +12,15 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource(value = "classpath:application-util.yml", factory = YamlPropertySourceFactory.class)
 @Data
 public class BatchConfig {
+    @Value("${util-config.app_config.batch_scheduled_freeblog_cron_job}")
+    private String batchScheduledFreeblogCronJob;
+
+    @Value("${util-config.app_config.batch_scheduled_old_file_clean_job}")
+    private String batchScheduledOldFileCleanCronJob;
+
+    @Value("${util-config.app_config.batch_region_time}")
+    private String batchRegionTime;
+
     @Value("${util-config.batch_config.old_file_clean_period}")
     private Long oldFileCleanPeriod;
 }

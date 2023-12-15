@@ -1,6 +1,8 @@
 package com.service.freeblog_batch.job.scheduler;
 
+import com.service.freeblog_batch.config.batch.BatchConfig;
 import com.service.freeblog_batch.job.FreeBlogBatchJob;
+import com.service.freeblog_batch.job.OldestFileBatchJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
@@ -21,10 +23,16 @@ public class BatchJobScheduler {
     @Autowired
     private FreeBlogBatchJob freeBlogBatchJob;
 
+    @Autowired
+    private OldestFileBatchJob oldestFileBatchJob;
+
+    @Autowired
+    private BatchConfig batchConfig;
+
     /**
      * TODO RDS, NoSql 데이터 정리 스케줄링
      */
-    @Scheduled(cron = "0 59 23 * * *") // 매일 23시 59분에 실행
+    @Scheduled(cron = "#{@batchConfig.batchScheduledFreeblogCronJob}", zone = "#{@batchConfig.batchRegionTime}")
     public void freeBlogBatchJobScheduler() {
         try {
             log.info("[BatchJobScheduler:freeBlogBatchJobScheduler] freeblog batch scheduler done");
@@ -37,19 +45,16 @@ public class BatchJobScheduler {
         }
     }
 
-    /**
-     * TODO Sftp <-> 파일 서버, 오래된 미참조 파일 삭제 스케쥴링
-     */
-    @Scheduled(cron = "0 44 4 1 1 *") // 매일 23시 59분에 실행
-    public void freeBlogBatchJobScheduler1() {
+    @Scheduled(cron = "#{@batchConfig.batchScheduledOldFileCleanCronJob}", zone = "#{@batchConfig.batchRegionTime}")
+    public void oldFileBatchJobScheduler() {
         try {
-            log.info("[BatchJobScheduler:freeBlogBatchJobScheduler1] freeblog batch scheduler done");
+            log.info("[BatchJobScheduler:oldFileBatchJobScheduler] old file batch scheduler done");
             Map<String, JobParameter> confMap = new HashMap<>();
             confMap.put("time", new JobParameter(System.currentTimeMillis()));
             JobParameters jobParameters = new JobParameters(confMap);
-            jobLauncher.run(freeBlogBatchJob.processJob(), jobParameters);
+            jobLauncher.run(oldestFileBatchJob.oldestFileJob(), jobParameters);
         } catch (Exception e) {
-            log.error("[BatchJobScheduler:freeBlogBatchJobScheduler] scheduler error =>", e);
+            log.error("[BatchJobScheduler:oldFileBatchJobScheduler] scheduler error =>", e);
         }
     }
 }
